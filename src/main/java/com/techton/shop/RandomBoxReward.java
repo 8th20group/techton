@@ -1,7 +1,7 @@
 package com.techton.shop;
 
 import com.techton.global.BusinessException;
-import java.util.concurrent.ThreadLocalRandom;
+import java.security.SecureRandom;
 import lombok.Getter;
 
 /**
@@ -17,6 +17,9 @@ public enum RandomBoxReward {
     POINT_50(50, 9),
     COACH_TICKET(0, 1);
 
+    // 예측 가능성 제거를 위해 비암호학적 PRNG(ThreadLocalRandom) 대신 CSPRNG 사용
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     private final int rewardPoint;
     private final int probability;
 
@@ -26,7 +29,7 @@ public enum RandomBoxReward {
     }
 
     public static RandomBoxReward draw() {
-        int roll = ThreadLocalRandom.current().nextInt(100);
+        int roll = RANDOM.nextInt(100);
         int cumulative = 0;
         for (RandomBoxReward reward : values()) {
             cumulative += reward.probability;

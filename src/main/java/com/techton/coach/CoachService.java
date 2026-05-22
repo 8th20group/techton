@@ -2,8 +2,8 @@ package com.techton.coach;
 
 import com.techton.coach.dto.CoachResponse;
 import com.techton.global.BusinessException;
+import java.security.SecureRandom;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CoachService {
+
+    // 코치 랜덤 배정도 예측 불가능하도록 CSPRNG 사용
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final CoachRepository coachRepository;
 
@@ -26,7 +29,7 @@ public class CoachService {
         if (coaches.isEmpty()) {
             throw new BusinessException("배정 가능한 코치가 없습니다.");
         }
-        return coaches.get(ThreadLocalRandom.current().nextInt(coaches.size()));
+        return coaches.get(RANDOM.nextInt(coaches.size()));
     }
 
     public Coach findById(Long coachId) {
