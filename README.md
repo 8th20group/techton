@@ -8,6 +8,70 @@
 
 ---
 
+## 0. 프론트 연동 빠른 확인
+
+### 서버 실행
+
+```bash
+./gradlew bootRun
+```
+
+기본 주소는 `http://localhost:8080` 입니다.
+
+### Swagger UI
+
+브라우저에서 아래 주소로 API를 확인하고 직접 호출할 수 있습니다.
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+OpenAPI JSON은 아래 주소에서 확인할 수 있습니다.
+
+```text
+http://localhost:8080/v3/api-docs
+```
+
+### HTTP 요청 파일
+
+IntelliJ HTTP Client 기준으로 아래 파일들을 사용할 수 있습니다.
+
+| 파일 | 내용 |
+|---|---|
+| `http/crew.http` | 회원가입 |
+| `http/auth.http` | 로그인, 내 정보 |
+| `http/point.http` | 포인트 내역 |
+| `http/github-sync.http` | GitHub 활동 수동 동기화 |
+| `http/shop.http` | 상점, 랜덤박스, 코치 이용권 구매 |
+| `http/ticket.http` | 이용권 목록, 사용 처리 |
+| `http/coach.http` | 코치 목록 |
+| `http/ranking.http` | 크루/코치 랭킹 |
+
+### 프론트 기본 흐름
+
+1. `POST /crews`로 회원가입합니다.
+2. `POST /auth/login`으로 로그인하고 응답의 `crewId`, `githubId`를 `localStorage`에 저장합니다.
+3. 새로고침 시 `GET /auth/me?githubId={githubId}`로 로그인 상태를 복원합니다.
+4. 메인 화면은 `GET /crews/{crewId}/points/summary`, `GET /rankings/crews`, `GET /rankings/coaches`를 조합합니다.
+5. 체크리스트 화면은 `GET /crews/{crewId}/weekly-activities`를 사용합니다.
+6. 초기 화면이나 체크리스트 화면에서 `POST /crews/{crewId}/activities/github/sync`를 호출하면 오늘 GitHub 활동을 즉시 불러올 수 있습니다.
+7. 미션 인증은 `multipart/form-data`로 `activityDate`, `image`, `memo`를 전송합니다.
+8. 블로그 인증은 JSON으로 `activityDate`, `blogUrl`, `memo`를 전송합니다.
+
+### 공통 에러 응답
+
+현재 MVP는 대부분의 비즈니스 오류를 `400 Bad Request`로 내려줍니다.
+
+```json
+{
+  "message": "포인트가 부족합니다."
+}
+```
+
+동시 포인트 사용 충돌은 `409 Conflict`로 내려줄 수 있습니다.
+
+---
+
 ## 1. 서비스 개요
 
 ### 핵심 아이디어
@@ -17,7 +81,8 @@
 - 포인트로 랜덤박스 또는 코치 이용권을 구매할 수 있다.
 - 코치 이용권은 코치 동의하에 사용할 수 있으며, 코치는 랜덤으로 배정된다.
 - 미션 인증, 블로그 인증 등은 우선 수동 검수 방식으로 처리한다.
-- 추후 GitHub API, LMS API, 크롤링, AI 검수 등으로 자동화할 수 있다.
+- 커밋과 리뷰는 GitHub public events를 매일 06:00에 조회해 자동 반영한다.
+- 추후 LMS API, 크롤링, AI 검수 등으로 자동화 범위를 넓힐 수 있다.
 
 ---
 
@@ -168,6 +233,9 @@ MVP에서는 GitHub ID만으로 로그인합니다.
 - 하루에 여러 번 커밋해도 5P만 지급
 - 주 최대 7회 인정
 - 주 최대 35P
+- 매일 06:00 KST에 GitHub public events의 전날 `PushEvent`를 조회해 자동 지급
+- 프론트에서 `POST /crews/{crewId}/activities/github/sync`를 호출하면 특정 크루의 오늘 활동을 즉시 불러올 수 있음
+- private repository 활동은 GitHub public events에 잡히지 않으므로 MVP에서는 인정하지 않음
 
 ### 리뷰 정책
 
@@ -175,6 +243,9 @@ MVP에서는 GitHub ID만으로 로그인합니다.
 - 하루에 여러 번 리뷰해도 5P만 지급
 - 주 최대 7회 인정
 - 주 최대 35P
+- 매일 06:00 KST에 GitHub public events의 전날 `PullRequestReviewEvent`, `PullRequestReviewCommentEvent`를 조회해 자동 지급
+- 프론트에서 `POST /crews/{crewId}/activities/github/sync`를 호출하면 특정 크루의 오늘 활동을 즉시 불러올 수 있음
+- private repository 활동은 GitHub public events에 잡히지 않으므로 MVP에서는 인정하지 않음
 
 ### 미션 성공 정책
 
@@ -457,6 +528,8 @@ Response
 GET /rankings/coaches
 ```
 
+이번주에 `USED` 처리된 이용권 수를 기준으로 집계합니다.
+
 Response
 
 ```json
@@ -537,6 +610,10 @@ Response
 
 ## 10.4 활동 인증 / 포인트 적립
 
+커밋과 리뷰는 기본적으로 GitHub public events 기반 자동 동기화로 지급됩니다.
+프론트에서는 `POST /crews/{crewId}/activities/github/sync`를 "GitHub 활동 불러오기" 버튼에 연결하면 됩니다.
+아래 커밋/리뷰 수동 인증 API는 해커톤 시연, 관리자 보정, 프론트 수동 테스트용으로 사용할 수 있습니다.
+
 ### 커밋 인증
 
 ```http
@@ -611,6 +688,35 @@ Response
 
 ---
 
+### 내 GitHub 활동 불러오기
+
+프론트에서 사용자가 회원가입/로그인 직후 또는 체크리스트 화면에서 누를 수 있는 API입니다.
+`activityDate`를 생략하면 오늘 날짜를 기준으로 해당 크루의 GitHub public events를 조회합니다.
+
+```http
+POST /crews/{crewId}/activities/github/sync?activityDate=2026-05-22
+```
+
+Response
+
+```json
+{
+  "activityDate": "2026-05-22",
+  "crewCount": 1,
+  "commitSyncedCount": 1,
+  "reviewSyncedCount": 0,
+  "message": "내 GitHub 활동 동기화 완료"
+}
+```
+
+프론트 처리 팁:
+
+- 응답 후 `GET /crews/{crewId}/weekly-activities`와 `GET /crews/{crewId}/points/summary`를 다시 조회하면 화면이 갱신됩니다.
+- 이미 지급된 날짜는 중복 지급되지 않으므로 버튼을 여러 번 눌러도 포인트가 중복 증가하지 않습니다.
+- GitHub public events 반영 지연이 있을 수 있어 방금 한 활동은 바로 안 잡힐 수 있습니다.
+
+---
+
 ### 미션 인증 요청
 
 ```http
@@ -671,6 +777,37 @@ Response
 ---
 
 ## 10.5 검수 API
+
+### GitHub 활동 수동 동기화
+
+커밋/리뷰 자동 지급은 매일 06:00 KST에 실행됩니다.
+시연이나 수동 보정이 필요하면 아래 API로 특정 날짜의 GitHub public events를 즉시 동기화할 수 있습니다.
+`activityDate`를 생략하면 전날을 기준으로 동기화합니다.
+
+```http
+POST /admin/activities/github/sync?activityDate=2026-05-22
+```
+
+Response
+
+```json
+{
+  "activityDate": "2026-05-22",
+  "crewCount": 3,
+  "commitSyncedCount": 2,
+  "reviewSyncedCount": 1,
+  "message": "전체 크루 GitHub 활동 동기화 완료"
+}
+```
+
+동기화 기준:
+
+- `githubId`로 `GET https://api.github.com/users/{githubId}/events/public` 조회
+- 해당 날짜의 `PushEvent`가 있으면 커밋 인증 처리
+- 해당 날짜의 `PullRequestReviewEvent` 또는 `PullRequestReviewCommentEvent`가 있으면 리뷰 인증 처리
+- 이미 같은 날짜에 승인된 커밋/리뷰가 있으면 중복 지급하지 않음
+- 주간 활동별 한도와 전체 주간 100P 한도를 그대로 적용
+- GitHub public events는 실시간 보장 API가 아니므로 늦은 밤 활동 누락을 줄이기 위해 자동 동기화는 06:00에 실행
 
 ### 검수 대기 목록 조회
 
@@ -1052,6 +1189,7 @@ Response
 - `Crew.point`는 현재 포인트 캐시값으로 사용합니다.
 - 모든 포인트 증감은 `PointHistory`에 기록합니다.
 - 포인트 차감과 지급은 하나의 트랜잭션으로 처리합니다.
+- `Crew.version`을 사용해 포인트 사용 동시성 충돌을 방어합니다.
 
 ### 주간 제한
 
@@ -1061,7 +1199,8 @@ Response
 
 ### 검수
 
-- 커밋 / 리뷰는 요청 즉시 승인 처리해도 됩니다.
+- 커밋 / 리뷰는 GitHub public events 자동 동기화로 즉시 승인 처리됩니다.
+- 커밋 / 리뷰 수동 인증 API는 테스트와 보정 용도로 유지합니다.
 - 미션 / 블로그는 `PENDING` 상태로 생성합니다.
 - 관리자가 승인하면 포인트를 지급합니다.
 
@@ -1077,11 +1216,10 @@ Response
 ## 14. 향후 확장 아이디어
 
 - GitHub OAuth 연동
-- GitHub API 기반 커밋 / 리뷰 자동 검증
+- GitHub 인증 토큰 기반 API rate limit 완화
 - LMS API 기반 미션 완료 자동 검증
 - 블로그 크롤링 기반 작성 여부 확인
 - AI 기반 회고 / 기술 블로그 검수
 - 코치별 이용권 수량 제한
 - 코치 승인 플로우 추가
 - 크루 CSV 기반 사전 인증
-
