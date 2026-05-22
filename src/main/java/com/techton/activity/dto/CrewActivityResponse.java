@@ -17,7 +17,6 @@ public record CrewActivityResponse(
         LocalDateTime createdAt,
         String rejectReason
 ) {
-
     public static CrewActivityResponse from(Activity activity) {
         return new CrewActivityResponse(
                 activity.getId(),
