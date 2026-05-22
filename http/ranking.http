@@ -1,0 +1,10 @@
+### 기본 URL
+@baseUrl = http://localhost:8080
+
+
+### 크루 랭킹
+GET {{baseUrl}}/rankings/crews
+
+
+### 코치 랭킹
+GET {{baseUrl}}/rankings/coaches

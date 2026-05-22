@@ -122,3 +122,9 @@ request "포인트 요약" \
 
 request "포인트 내역" \
   "$BASE_URL/crews/$CREW_ID/point-histories"
+
+request "크루 랭킹" \
+  "$BASE_URL/rankings/crews"
+
+request "코치 랭킹" \
+  "$BASE_URL/rankings/coaches"
