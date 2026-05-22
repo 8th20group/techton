@@ -31,3 +31,5 @@ springdoc:
 github:
   api:
     base-url: https://api.github.com
+
+kind: Application

@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-@Component
 public class LocalFileStorage implements FileStorage {
 
     private static final Path ROOT_PATH = Path.of("uploads", "missions");
