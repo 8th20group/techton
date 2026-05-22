@@ -40,6 +40,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     List<Activity> findByStatus(ActivityStatus status);
 
+    List<Activity> findByCrewIdOrderByCreatedAtDesc(Long crewId);
+
     @Query("""
             select coalesce(sum(a.point), 0)
             from Activity a

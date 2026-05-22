@@ -218,6 +218,11 @@ const API = {
             .then(this.handleResponse);
     },
 
+    async getCrewActivities(crewId) {
+        return fetch(`${this.baseUrl}/crews/${crewId}/activities`)
+            .then(this.handleResponse);
+    },
+
     async getCrewRankings() {
         return fetch(`${this.baseUrl}/rankings/crews`)
             .then(this.handleResponse);
@@ -845,6 +850,69 @@ const App = {
                 </div>
             `;
         }).join('');
+
+        // Render My Submissions list and status / rejection reason
+        const mySubmissionsTbody = document.getElementById('my-submissions-list');
+        if (!mySubmissionsTbody) return;
+
+        try {
+            const myActivities = await API.getCrewActivities(state.currentCrew.crewId);
+            const manualActivities = myActivities.filter(act => act.type === 'MISSION' || act.type === 'BLOG');
+            
+            if (manualActivities.length === 0) {
+                mySubmissionsTbody.innerHTML = `<tr><td colspan="5" class="text-center font-muted">인증 신청 내역이 존재하지 않습니다.</td></tr>`;
+            } else {
+                mySubmissionsTbody.innerHTML = manualActivities.map(act => {
+                    let typeIcon = act.type === 'MISSION' ? '🏆' : '✍️';
+                    let typeText = act.type === 'MISSION' ? '미션 성공' : '블로그/회고';
+                    let statusClass = act.status.toLowerCase(); // pending, approved, rejected
+                    let statusText = '';
+                    if (act.status === 'PENDING') statusText = '검수 대기';
+                    else if (act.status === 'APPROVED') statusText = '승인 완료';
+                    else if (act.status === 'REJECTED') statusText = '반려됨';
+
+                    const createdAtFormatted = new Date(act.createdAt).toLocaleString('ko-KR', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    // Evidence URL and Memo
+                    let detailsHtml = '';
+                    if (act.type === 'BLOG') {
+                        detailsHtml += `<div class="sub-link-info">링크: <a href="${act.evidenceUrl}" target="_blank" class="evidence-link text-indigo" style="text-decoration: underline;">${act.evidenceUrl}</a></div>`;
+                    } else if (act.type === 'MISSION') {
+                        detailsHtml += `<div class="sub-link-info">증빙: <a href="${act.evidenceUrl}" target="_blank" class="evidence-link text-indigo" style="text-decoration: underline;">인증 사진 보기 🖼️</a></div>`;
+                    }
+
+                    if (act.memo) {
+                        detailsHtml += `<div class="sub-memo-info font-muted" style="margin-top: 4px;">메모: ${act.memo}</div>`;
+                    }
+
+                    // If rejected, show reason
+                    if (act.status === 'REJECTED' && act.rejectReason) {
+                        detailsHtml += `
+                            <div class="sub-reject-reason-box">
+                                <span class="reject-icon">⚠️</span>
+                                <span class="reject-label">반려 사유:</span>
+                                <span class="reject-text">${act.rejectReason}</span>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <tr>
+                            <td class="font-muted" style="font-size: 0.82rem;">${createdAtFormatted}</td>
+                            <td style="font-weight: 600;"><span style="margin-right: 6px;">${typeIcon}</span>${typeText}</td>
+                            <td style="font-family: var(--font-outfit); font-size: 0.9rem;">${act.activityDate}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td class="text-left" style="font-size: 0.88rem;">${detailsHtml}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        } catch (e) {
+            console.error("Failed to render my submissions list:", e);
+            mySubmissionsTbody.innerHTML = `<tr><td colspan="5" class="text-center font-muted">내역을 불러오는 중 오류가 발생했습니다.</td></tr>`;
+        }
     },
 
     // 3. SHOP SUBVIEW

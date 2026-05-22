@@ -7,6 +7,7 @@ import com.techton.activity.dto.ActivityRejectResponse;
 import com.techton.activity.dto.ActivitySubmitResponse;
 import com.techton.activity.dto.BlogActivityRequest;
 import com.techton.activity.dto.CommitActivityRequest;
+import com.techton.activity.dto.CrewActivityResponse;
 import com.techton.activity.dto.PendingActivityResponse;
 import com.techton.activity.dto.ReviewActivityRequest;
 import com.techton.activity.dto.WeeklyActivityItemResponse;
@@ -115,6 +116,14 @@ public class ActivityService {
                         weeklyItem(crewId, ActivityType.BLOG, "회고/기술 블로그", 20, 1, 20, weekStartDate, weekEndDate)
                 )
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<CrewActivityResponse> getCrewActivities(Long crewId) {
+        findCrew(crewId);
+        return activityRepository.findByCrewIdOrderByCreatedAtDesc(crewId).stream()
+                .map(CrewActivityResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)

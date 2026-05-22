@@ -292,8 +292,8 @@
                             <!-- Rankings Tab Options -->
                             <div class="rankings-container glass-card">
                                 <div class="rankings-header-tabs">
-                                    <button class="rank-tab-btn active" data-tab="crews-rank">👥 크루 랭킹</button>
-                                    <button class="rank-tab-btn" data-tab="coaches-rank">👑 인기 코치 랭킹</button>
+                                    <button class="rank-tab-btn active" data-tab="tab-crews-rank">👥 크루 랭킹</button>
+                                    <button class="rank-tab-btn" data-tab="tab-coaches-rank">👑 인기 코치 랭킹</button>
                                 </div>
 
                                 <!-- Crew Rankings Table -->
@@ -447,6 +447,27 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- My Manual Certification Status Card -->
+                    <div class="my-submissions-card glass-card fade-in" style="margin-top: 30px;">
+                        <h3 class="panel-title">나의 활동 인증 신청 현황</h3>
+                        <div class="submission-table-wrapper">
+                            <table class="submission-table">
+                                <thead>
+                                    <tr>
+                                        <th>신청 시간</th>
+                                        <th>활동 유형</th>
+                                        <th>인증 일자</th>
+                                        <th style="width: 120px;">상태</th>
+                                        <th>상세 정보 (증빙 / 메모 / 반려 사유)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="my-submissions-list">
+                                    <tr><td colspan="5" class="text-center font-muted">인증 신청 내역이 존재하지 않습니다.</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>

@@ -7,6 +7,7 @@ import com.techton.activity.dto.ActivityRejectResponse;
 import com.techton.activity.dto.ActivitySubmitResponse;
 import com.techton.activity.dto.BlogActivityRequest;
 import com.techton.activity.dto.CommitActivityRequest;
+import com.techton.activity.dto.CrewActivityResponse;
 import com.techton.activity.dto.PendingActivityResponse;
 import com.techton.activity.dto.ReviewActivityRequest;
 import com.techton.activity.dto.WeeklyActivitiesResponse;
@@ -54,6 +55,11 @@ public class ActivityController {
     @GetMapping("/crews/{crewId}/weekly-activities")
     public WeeklyActivitiesResponse weeklyActivities(@PathVariable Long crewId) {
         return activityService.weeklyActivities(crewId);
+    }
+
+    @GetMapping("/crews/{crewId}/activities")
+    public List<CrewActivityResponse> getCrewActivities(@PathVariable Long crewId) {
+        return activityService.getCrewActivities(crewId);
     }
 
     @GetMapping("/admin/activities/pending")
