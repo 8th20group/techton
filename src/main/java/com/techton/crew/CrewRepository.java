@@ -6,9 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CrewRepository extends JpaRepository<Crew, Long> {
 
-    boolean existsByGithubId(String githubId);
-
-    Optional<Crew> findByGithubId(String githubId);
+    Optional<Crew> findByGithubIdIgnoreCase(String githubId);
 
     List<Crew> findAllByOrderByPointDescIdAsc();
 }

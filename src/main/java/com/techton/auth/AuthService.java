@@ -37,8 +37,8 @@ public class AuthService {
     }
 
     private Crew findCrew(String githubId) {
-        return crewRepository.findByGithubId(githubId)
-                .orElseThrow(() -> new BusinessException("가입되지 않은 GitHub ID입니다."));
+        return crewRepository.findByGithubIdIgnoreCase(githubId)
+                .orElseThrow(() -> new BusinessException("등록된 크루 정보가 아닙니다."));
     }
 
     private void validateGithubId(String githubId) {

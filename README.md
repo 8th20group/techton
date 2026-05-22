@@ -38,7 +38,6 @@ IntelliJ HTTP Client 기준으로 아래 파일들을 사용할 수 있습니다
 
 | 파일 | 내용 |
 |---|---|
-| `http/crew.http` | 회원가입 |
 | `http/auth.http` | 로그인, 내 정보 |
 | `http/point.http` | 포인트 내역 |
 | `http/github-sync.http` | GitHub 활동 수동 동기화 |
@@ -49,14 +48,13 @@ IntelliJ HTTP Client 기준으로 아래 파일들을 사용할 수 있습니다
 
 ### 프론트 기본 흐름
 
-1. `POST /crews`로 회원가입합니다.
-2. `POST /auth/login`으로 로그인하고 응답의 `crewId`, `githubId`를 `localStorage`에 저장합니다.
-3. 새로고침 시 `GET /auth/me?githubId={githubId}`로 로그인 상태를 복원합니다.
-4. 메인 화면은 `GET /crews/{crewId}/points/summary`, `GET /rankings/crews`, `GET /rankings/coaches`를 조합합니다.
-5. 체크리스트 화면은 `GET /crews/{crewId}/weekly-activities`를 사용합니다.
-6. 초기 화면이나 체크리스트 화면에서 `POST /crews/{crewId}/activities/github/sync`를 호출하면 오늘 GitHub 활동을 즉시 불러올 수 있습니다.
-7. 미션 인증은 `multipart/form-data`로 `activityDate`, `image`, `memo`를 전송합니다.
-8. 블로그 인증은 JSON으로 `activityDate`, `blogUrl`, `memo`를 전송합니다.
+1. `POST /auth/login`으로 로그인하고 응답의 `crewId`, `githubId`를 `localStorage`에 저장합니다.
+2. 새로고침 시 `GET /auth/me?githubId={githubId}`로 로그인 상태를 복원합니다.
+3. 메인 화면은 `GET /crews/{crewId}/points/summary`, `GET /rankings/crews`, `GET /rankings/coaches`를 조합합니다.
+4. 체크리스트 화면은 `GET /crews/{crewId}/weekly-activities`를 사용합니다.
+5. 초기 화면이나 체크리스트 화면에서 `POST /crews/{crewId}/activities/github/sync`를 호출하면 오늘 GitHub 활동을 즉시 불러올 수 있습니다.
+6. 미션 인증은 `multipart/form-data`로 `activityDate`, `image`, `memo`를 전송합니다.
+7. 블로그 인증은 JSON으로 `activityDate`, `blogUrl`, `memo`를 전송합니다.
 
 ### 공통 에러 응답
 
@@ -127,53 +125,39 @@ IntelliJ HTTP Client 기준으로 아래 파일들을 사용할 수 있습니다
 - GitHub ID 기반 로그인
 - 비밀번호 없음
 - 보안 고려하지 않음
+- 회원가입 없음
+- 크루 데이터는 `members.json`, `fe_members.json`, `aos_members.json` 기반 `data.sql`로 서버 시작 시 미리 적재
+- 로그인 시 GitHub ID는 대소문자를 구분하지 않음
 - 프론트는 로그인 성공 후 `crewId` 또는 `githubId`를 localStorage에 저장
 - 새로고침 시 `/auth/me` API로 로그인 상태 확인
 
 ### 크루 인증
 
 - OAuth는 우선 제외
-- 회원가입 시 입력받는 값
+- 등록된 우테코 크루만 로그인 가능
+- 등록 기준 정보
   - GitHub ID
   - 닉네임
-  - 분야
-- 기수는 우선 8기로 고정하되 서버에는 저장
-- 자체 CSV 기반 인증은 후순위
+  - 파트
+- `AOS` 파트는 서버 `Track` enum의 `ANDROID`로 저장
+- 기수는 8기로 고정 저장
 
 ---
 
 ## 5. 화면 구성
 
-### 5.1 크루 회원가입 페이지
-
-입력값:
-
-- GitHub ID
-- 닉네임
-- 분야
-  - BE
-  - FE
-  - ANDROID
-
-기수:
-
-- 8기 고정
-- 사용자가 입력하지 않음
-- 서버에서 저장
-
----
-
-### 5.2 로그인 페이지
+### 5.1 로그인 페이지
 
 입력값:
 
 - GitHub ID
 
 MVP에서는 GitHub ID만으로 로그인합니다.
+등록된 크루가 아니면 로그인할 수 없습니다.
 
 ---
 
-### 5.3 메인 페이지
+### 5.2 메인 페이지
 
 표시 정보:
 
@@ -188,7 +172,7 @@ MVP에서는 GitHub ID만으로 로그인합니다.
 
 ---
 
-### 5.4 주간 포인트 체크리스트 페이지
+### 5.3 주간 포인트 체크리스트 페이지
 
 표시 정보:
 
@@ -202,7 +186,7 @@ MVP에서는 GitHub ID만으로 로그인합니다.
 
 ---
 
-### 5.5 포인트 상점 페이지
+### 5.4 포인트 상점 페이지
 
 상품:
 
@@ -378,38 +362,7 @@ USE
 
 ## 10. API 명세
 
-## 10.1 크루 회원가입 / 로그인
-
-### 크루 회원가입
-
-```http
-POST /crews
-```
-
-Request
-
-```json
-{
-  "githubId": "if123",
-  "nickname": "이프",
-  "track": "BE"
-}
-```
-
-Response
-
-```json
-{
-  "id": 1,
-  "githubId": "if123",
-  "nickname": "이프",
-  "generation": 8,
-  "track": "BE",
-  "point": 0
-}
-```
-
----
+## 10.1 로그인
 
 ### 로그인
 
@@ -421,17 +374,28 @@ Request
 
 ```json
 {
-  "githubId": "if123"
+  "githubId": "sauter001"
 }
 ```
+
+GitHub ID는 대소문자를 구분하지 않습니다.
+서버에 미리 등록된 크루만 로그인할 수 있습니다.
 
 Response
 
 ```json
 {
-  "crewId": 1,
-  "githubId": "if123",
-  "nickname": "이프"
+  "crewId": 5,
+  "githubId": "Sauter001",
+  "nickname": "요크"
+}
+```
+
+등록되지 않은 GitHub ID인 경우:
+
+```json
+{
+  "message": "등록된 크루 정보가 아닙니다."
 }
 ```
 
@@ -451,19 +415,19 @@ MVP에서는 실제 세션/JWT가 없으므로 구현 방식은 팀에서 단순
 예시:
 
 ```http
-GET /auth/me?githubId=if123
+GET /auth/me?githubId=sauter001
 ```
 
 Response
 
 ```json
 {
-  "crewId": 1,
-  "githubId": "if123",
-  "nickname": "이프",
+  "crewId": 5,
+  "githubId": "Sauter001",
+  "nickname": "요크",
   "generation": 8,
   "track": "BE",
-  "point": 120
+  "point": 0
 }
 ```
 
@@ -690,7 +654,7 @@ Response
 
 ### 내 GitHub 활동 불러오기
 
-프론트에서 사용자가 회원가입/로그인 직후 또는 체크리스트 화면에서 누를 수 있는 API입니다.
+프론트에서 사용자가 로그인 직후 또는 체크리스트 화면에서 누를 수 있는 API입니다.
 `activityDate`를 생략하면 오늘 날짜를 기준으로 해당 크루의 GitHub public events를 조회합니다.
 
 ```http
@@ -1164,21 +1128,20 @@ Response
 
 ## 12. MVP 구현 우선순위
 
-1. `POST /crews`
-2. `POST /auth/login`
-3. `GET /auth/me`
-4. `GET /crews/{crewId}/points/summary`
-5. `POST /crews/{crewId}/activities/commit`
-6. `POST /crews/{crewId}/activities/review`
-7. `POST /crews/{crewId}/activities/mission`
-8. `POST /crews/{crewId}/activities/blog`
-9. `GET /shop/items`
-10. `POST /crews/{crewId}/shop/random-box`
-11. `POST /crews/{crewId}/shop/coach-tickets`
-12. `GET /rankings/crews`
-13. `GET /crews/{crewId}/weekly-activities`
-14. `GET /crews/{crewId}/tickets`
-15. `PATCH /crews/{crewId}/tickets/{ticketId}/use`
+1. `POST /auth/login`
+2. `GET /auth/me`
+3. `GET /crews/{crewId}/points/summary`
+4. `POST /crews/{crewId}/activities/github/sync`
+5. `POST /crews/{crewId}/activities/mission`
+6. `POST /crews/{crewId}/activities/blog`
+7. `GET /shop/items`
+8. `POST /crews/{crewId}/shop/random-box`
+9. `POST /crews/{crewId}/shop/coach-tickets`
+10. `GET /rankings/crews`
+11. `GET /rankings/coaches`
+12. `GET /crews/{crewId}/weekly-activities`
+13. `GET /crews/{crewId}/tickets`
+14. `PATCH /crews/{crewId}/tickets/{ticketId}/use`
 
 ---
 

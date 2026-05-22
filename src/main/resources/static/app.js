@@ -187,14 +187,6 @@ const API = {
         return res.json().catch(() => ({}));
     },
 
-    async register(githubId, nickname, track) {
-        return fetch(`${this.baseUrl}/crews`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ githubId, nickname, track })
-        }).then(this.handleResponse);
-    },
-
     async login(githubId) {
         return fetch(`${this.baseUrl}/auth/login`, {
             method: 'POST',
@@ -345,7 +337,6 @@ const App = {
     init() {
         this.loader = document.getElementById('app-loader');
         this.loginView = document.getElementById('login-view');
-        this.registerView = document.getElementById('register-view');
         this.mainShell = document.getElementById('main-shell');
         
         this.bindEvents();
@@ -357,42 +348,6 @@ const App = {
     },
 
     bindEvents() {
-        // Auth Redirections
-        document.getElementById('go-to-register').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.loginView.style.display = 'none';
-            this.registerView.style.display = 'block';
-        });
-
-        document.getElementById('go-to-login').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.registerView.style.display = 'none';
-            this.loginView.style.display = 'block';
-        });
-
-        // Register Action
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const githubId = document.getElementById('reg-github-id').value.trim();
-            const nickname = document.getElementById('reg-nickname').value.trim();
-            const track = document.getElementById('reg-track').value;
-            
-            this.showLoader(true);
-            try {
-                const crew = await API.register(githubId, nickname, track);
-                showToast('회원가입이 완료되었습니다! 로그인합니다.', 'success');
-                this.saveSession(crew.githubId, crew.id, crew.nickname);
-                await this.refreshUserContext();
-                this.registerView.style.display = 'none';
-                this.mainShell.style.display = 'flex';
-                this.switchSubview('dashboard');
-            } catch (err) {
-                showToast(err.message, 'danger');
-            } finally {
-                this.showLoader(false);
-            }
-        });
-
         // Login Action
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
