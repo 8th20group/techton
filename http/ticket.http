@@ -1,0 +1,22 @@
+### 기본 URL
+@baseUrl = http://localhost:8080
+
+### 변수 (실제 값으로 변경하세요)
+@crewId = 1
+@ticketId = 1
+
+
+### 내 티켓 목록 조회
+GET {{baseUrl}}/crews/{{crewId}}/tickets
+
+
+### 티켓 사용
+PATCH {{baseUrl}}/crews/{{crewId}}/tickets/{{ticketId}}/use
+
+
+### 이미 사용한 티켓 재사용 에러 케이스
+PATCH {{baseUrl}}/crews/{{crewId}}/tickets/{{ticketId}}/use
+
+
+### 존재하지 않는 티켓 에러 케이스
+PATCH {{baseUrl}}/crews/{{crewId}}/tickets/999/use

@@ -1,0 +1,13 @@
+### 기본 URL
+@baseUrl = http://localhost:8080
+
+### 변수 (실제 값으로 변경하세요)
+@crewId = 1
+
+
+### 포인트 내역 조회
+GET {{baseUrl}}/crews/{{crewId}}/point-histories
+
+
+### 존재하지 않는 크루 에러 케이스
+GET {{baseUrl}}/crews/999/point-histories

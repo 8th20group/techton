@@ -1,0 +1,6 @@
+### 기본 URL
+@baseUrl = http://localhost:8080
+
+
+### 전체 코치 목록 조회
+GET {{baseUrl}}/coaches

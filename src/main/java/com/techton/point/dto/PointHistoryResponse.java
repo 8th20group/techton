@@ -11,12 +11,12 @@ public record PointHistoryResponse(
         LocalDateTime createdAt
 ) {
 
-    public static PointHistoryResponse from(PointHistory pointHistory) {
+    public static PointHistoryResponse from(PointHistory history) {
         return new PointHistoryResponse(
-                pointHistory.getType(),
-                pointHistory.getAmount(),
-                pointHistory.getReason(),
-                pointHistory.getCreatedAt()
+                history.getType(),
+                history.getAmount(),
+                history.getReason(),
+                history.getCreatedAt()
         );
     }
 }

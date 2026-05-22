@@ -15,7 +15,6 @@ import com.techton.crew.CrewRepository;
 import com.techton.global.BusinessException;
 import com.techton.point.PointHistory;
 import com.techton.point.PointHistoryRepository;
-import com.techton.point.PointHistoryType;
 import com.techton.storage.FileStorage;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -127,10 +126,9 @@ public class ActivityService {
         int earnedPoint = calculateEarnablePoint(activity.getCrew().getId(), activity.getType(), activity.getActivityDate());
         activity.approve(earnedPoint);
         if (earnedPoint > 0) {
-            activity.getCrew().addPoint(earnedPoint);
-            pointHistoryRepository.save(new PointHistory(
-                    activity.getCrew(),
-                    PointHistoryType.EARN,
+            activity.getCrew().earnPoint(earnedPoint);
+            pointHistoryRepository.save(PointHistory.earn(
+                    activity.getCrew().getId(),
                     earnedPoint,
                     activity.getType().getDisplayName() + " 인증"
             ));
@@ -159,8 +157,8 @@ public class ActivityService {
         int earnedPoint = calculateEarnablePoint(crewId, type, activityDate);
         activityRepository.save(new Activity(crew, type, earnedPoint, ActivityStatus.APPROVED, evidenceUrl, memo, activityDate));
         if (earnedPoint > 0) {
-            crew.addPoint(earnedPoint);
-            pointHistoryRepository.save(new PointHistory(crew, PointHistoryType.EARN, earnedPoint, type.getDisplayName() + " 인증"));
+            crew.earnPoint(earnedPoint);
+            pointHistoryRepository.save(PointHistory.earn(crew.getId(), earnedPoint, type.getDisplayName() + " 인증"));
         }
 
         String message = earnedPoint > 0

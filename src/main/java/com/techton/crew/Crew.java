@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import com.techton.global.BusinessException;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +41,9 @@ public class Crew {
     @Column(nullable = false)
     private int point;
 
+    @Version
+    private Long version;
+
     public Crew(String githubId, String nickname, Track track) {
         this.githubId = githubId;
         this.nickname = nickname;
@@ -47,7 +52,20 @@ public class Crew {
         this.point = INITIAL_POINT;
     }
 
-    public void addPoint(int point) {
-        this.point += point;
+    public void earnPoint(int amount) {
+        if (amount < 0) {
+            throw new BusinessException("적립 포인트는 0 이상이어야 합니다.");
+        }
+        this.point += amount;
+    }
+
+    public void usePoint(int amount) {
+        if (amount < 0) {
+            throw new BusinessException("사용 포인트는 0 이상이어야 합니다.");
+        }
+        if (this.point < amount) {
+            throw new BusinessException("포인트가 부족합니다.");
+        }
+        this.point -= amount;
     }
 }

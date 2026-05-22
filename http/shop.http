@@ -1,0 +1,39 @@
+### 기본 URL
+@baseUrl = http://localhost:8080
+
+### 변수 (크루 등록 후 받은 id로 변경하세요)
+@crewId = 1
+
+
+### 상점 아이템 목록 조회
+GET {{baseUrl}}/shop/items
+
+
+### 랜덤 박스 구매 (10포인트 소모)
+POST {{baseUrl}}/crews/{{crewId}}/shop/random-box
+
+
+### 코치 카페 티켓 구매 (100포인트 소모, 주당 1회 제한)
+POST {{baseUrl}}/crews/{{crewId}}/shop/coach-tickets
+Content-Type: application/json
+
+{
+  "ticketType": "CAFE"
+}
+
+
+### 코치 식사 티켓 구매 (300포인트 소모, 주당 1회 제한)
+POST {{baseUrl}}/crews/{{crewId}}/shop/coach-tickets
+Content-Type: application/json
+
+{
+  "ticketType": "MEAL"
+}
+
+
+### 포인트 부족 에러 케이스 (포인트 없는 크루로 랜덤 박스 구매)
+POST {{baseUrl}}/crews/{{crewId}}/shop/random-box
+
+
+### 존재하지 않는 크루 에러 케이스
+POST {{baseUrl}}/crews/999/shop/random-box
