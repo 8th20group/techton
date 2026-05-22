@@ -3,6 +3,7 @@ package com.techton.activity;
 import com.techton.activity.dto.ActivityApprovalResponse;
 import com.techton.activity.dto.ActivityEarnResponse;
 import com.techton.activity.dto.ActivityRejectRequest;
+import com.techton.activity.dto.ActivityRejectResponse;
 import com.techton.activity.dto.ActivitySubmitResponse;
 import com.techton.activity.dto.BlogActivityRequest;
 import com.techton.activity.dto.CommitActivityRequest;
@@ -145,13 +146,13 @@ public class ActivityService {
         return new ActivityApprovalResponse(activity.getId(), activity.getStatus(), earnedPoint);
     }
 
-    public ActivitySubmitResponse reject(Long activityId, ActivityRejectRequest request) {
+    public ActivityRejectResponse reject(Long activityId, ActivityRejectRequest request) {
         Activity activity = findActivity(activityId);
         if (activity.getStatus() != ActivityStatus.PENDING) {
             throw new BusinessException("검수 대기 상태의 활동만 거절할 수 있습니다.");
         }
         activity.reject(request.reason());
-        return new ActivitySubmitResponse(activity.getId(), activity.getStatus(), request.reason());
+        return new ActivityRejectResponse(activity.getId(), activity.getStatus(), request.reason());
     }
 
     private ActivityEarnResponse approveDailyActivity(Long crewId, ActivityType type, LocalDate activityDate,
