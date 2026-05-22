@@ -53,6 +53,10 @@ Content-Type: image/png
 GET {{baseUrl}}/crews/{{crewId}}/weekly-activities
 
 
+### 크루의 전체 활동 내역 조회 (수동 인증 승인 상태 및 반려 사유 포함)
+GET {{baseUrl}}/crews/{{crewId}}/activities
+
+
 ### [관리자] 승인 대기 활동 목록 조회
 GET {{baseUrl}}/admin/activities/pending
 
@@ -66,5 +70,6 @@ PATCH {{baseUrl}}/admin/activities/{{activityId}}/reject
 Content-Type: application/json
 
 {
-  "reason": "블로그 URL이 유효하지 않습니다."
+  "reason": "블로그 글에 우테코 관련 내용이 포함되어 있지 않습니다. 보완하여 제출바랍니다."
 }
+
