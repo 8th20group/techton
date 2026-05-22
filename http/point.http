@@ -5,6 +5,10 @@
 @crewId = 1
 
 
+### 포인트 요약 조회 (총 포인트, 주간 획득량, 활동별 내역)
+GET {{baseUrl}}/crews/{{crewId}}/points/summary
+
+
 ### 포인트 내역 조회
 GET {{baseUrl}}/crews/{{crewId}}/point-histories
 
