@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우테코 크루 포인트 상점</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Global Application Shell -->
+    <div id="app">
+        <!-- Loader Skeleton -->
+        <div id="app-loader" class="app-loader">
+            <div class="loader-spinner"></div>
+            <p>포인트 상점 불러오는 중...</p>
+        </div>
+
+        <!-- ==================== 1. LOGIN VIEW ==================== -->
+        <div id="login-view" class="view-panel glass-card fade-in" style="display: none;">
+            <div class="brand-header">
+                <div class="logo-glow"></div>
+                <h1 class="brand-title">CREW POINT SHOP</h1>
+                <p class="brand-subtitle">우아한테크코스 크루 포인트 상점</p>
+            </div>
+            
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-github-id">GitHub ID</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">@</span>
+                        <input type="text" id="login-github-id" placeholder="GitHub 아이디를 입력하세요" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    로그인
+                    <span class="btn-glow"></span>
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                아직 계정이 없으신가요? <a href="#" id="go-to-register">크루 등록하기</a>
+            </div>
+        </div>
+
+        <!-- ==================== 2. REGISTER VIEW ==================== -->
+        <div id="register-view" class="view-panel glass-card fade-in" style="display: none;">
+            <div class="brand-header">
+                <h1 class="brand-title">JOIN CREW</h1>
+                <p class="brand-subtitle">크루 정보를 등록하고 활동 포인트를 획득하세요</p>
+            </div>
+            
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="reg-github-id">GitHub ID</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">@</span>
+                        <input type="text" id="reg-github-id" placeholder="github-username" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-nickname">닉네임</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="reg-nickname" placeholder="우테코 닉네임" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-track">분야 (Track)</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">💻</span>
+                        <select id="reg-track" required>
+                            <option value="" disabled selected>분야를 선택해주세요</option>
+                            <option value="BE">BE (백엔드)</option>
+                            <option value="FE">FE (프론트엔드)</option>
+                            <option value="ANDROID">ANDROID (안드로이드)</option>
+                            <option value="SOFT">SOFT (소프트스킬)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>기수</label>
+                    <div class="input-wrapper disabled">
+                        <span class="input-icon">🏅</span>
+                        <input type="text" value="8기 (고정)" disabled>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    크루 등록 완료
+                    <span class="btn-glow"></span>
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                이미 등록하셨나요? <a href="#" id="go-to-login">로그인하러 가기</a>
+            </div>
+        </div>
+
+        <!-- ==================== 3. MAIN DASHBOARD SHELL ==================== -->
+        <div id="main-shell" class="dashboard-shell" style="display: none;">
+            
+            <!-- Mobile Header -->
+            <header class="mobile-header">
+                <span class="menu-brand">Crew Point Shop</span>
+                <button id="mobile-menu-toggle" class="menu-toggle">☰</button>
+            </header>
+
+            <!-- Navigation Sidebar -->
+            <aside id="sidebar" class="sidebar glass-card">
+                <div class="sidebar-brand">
+                    <span class="brand-logo-small">⚡</span>
+                    <span class="brand-text">POINT SHOP</span>
+                </div>
+
+                <!-- User Profile Card -->
+                <div class="user-profile-card">
+                    <div class="avatar-container">
+                        <img id="user-avatar" src="https://github.com/identicons/default.png" alt="Avatar" class="user-avatar">
+                        <span class="track-badge" id="user-track-badge">BE</span>
+                    </div>
+                    <div class="user-info">
+                        <h3 id="user-nickname" class="user-name">이프</h3>
+                        <p id="user-github" class="user-github-id">@if123</p>
+                    </div>
+                    <div class="points-pill-container">
+                        <div class="points-pill">
+                            <span class="premium-coin"></span>
+                            <span id="user-points" class="points-val">0</span><span class="points-unit">P</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li>
+                            <a href="#" class="nav-link active" data-target="dashboard">
+                                <span class="nav-icon">📊</span> 대시보드
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link" data-target="checklist">
+                                <span class="nav-icon">✅</span> 주간 체크리스트
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link" data-target="shop">
+                                <span class="nav-icon">🛒</span> 포인트 상점
+                            </a>
+                        </li>
+                        <li id="admin-nav-item" style="display: none;">
+                            <a href="#" class="nav-link admin-link" data-target="admin">
+                                <span class="nav-icon">🛡️</span> 관리자 패널
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Sidebar Footer Controls -->
+                <div class="sidebar-footer">
+                    <button id="toggle-admin-mode" class="btn btn-outline btn-sm btn-block">
+                        🛡️ 관리자 모드 활성
+                    </button>
+                    <button id="btn-logout" class="btn btn-ghost btn-sm btn-block">
+                        🚪 로그아웃
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                
+                <!-- Dynamic Subviews -->
+                
+                <!-- [SUBVIEW A] DASHBOARD -->
+                <section id="subview-dashboard" class="subview fade-in">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">환영합니다!</h2>
+                            <p class="section-desc">우테코 주간 활동 포인트를 확인하고 혜택을 누려보세요.</p>
+                        </div>
+                        <button id="btn-dashboard-sync" class="btn btn-secondary">
+                            🔄 GitHub 활동 실시간 동기화
+                        </button>
+                    </div>
+
+                    <!-- Point Stat Dashboard -->
+                    <div class="stats-grid">
+                        <!-- Total Point Card -->
+                        <div class="stat-card glass-card border-glow-indigo">
+                            <div class="stat-icon"><span class="premium-coin large"></span></div>
+                            <div class="stat-details">
+                                <span class="stat-label">보유 포인트</span>
+                                <h3 class="stat-value" id="dashboard-total-points">0 P</h3>
+                                <p class="stat-sub">상점에서 기프티콘 및 이용권 구매 가능</p>
+                            </div>
+                        </div>
+
+                        <!-- Weekly Earned Card -->
+                        <div class="stat-card glass-card border-glow-emerald">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-details">
+                                <span class="stat-label">이번주 획득 포인트</span>
+                                <div class="weekly-progress-numeric">
+                                    <h3 class="stat-value" id="dashboard-weekly-earned">0</h3>
+                                    <span class="stat-value-limit">/ 100 P</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill emerald" id="dashboard-weekly-progress-bar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Grid -->
+                    <div class="dashboard-grid">
+                        
+                        <!-- Left Panel: Activity Summary -->
+                        <div class="dashboard-left glass-card">
+                            <h3 class="panel-title">이번주 나의 활동 현황</h3>
+                            <div class="activity-summary-list">
+                                <!-- Commit Activity -->
+                                <div class="activity-summary-item">
+                                    <div class="activity-indicator commit">
+                                        <span class="activity-icon">💻</span>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-meta">
+                                            <span class="activity-name">GitHub 커밋</span>
+                                            <span class="activity-points" id="sum-commit-points">0 P</span>
+                                        </div>
+                                        <p class="activity-rule">일 1회 5P (주 최대 35P)</p>
+                                    </div>
+                                </div>
+                                <!-- Review Activity -->
+                                <div class="activity-summary-item">
+                                    <div class="activity-indicator review">
+                                        <span class="activity-icon">🔍</span>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-meta">
+                                            <span class="activity-name">PR 리뷰</span>
+                                            <span class="activity-points" id="sum-review-points">0 P</span>
+                                        </div>
+                                        <p class="activity-rule">일 1회 5P (주 최대 35P)</p>
+                                    </div>
+                                </div>
+                                <!-- Mission Activity -->
+                                <div class="activity-summary-item">
+                                    <div class="activity-indicator mission">
+                                        <span class="activity-icon">🏆</span>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-meta">
+                                            <span class="activity-name">미션 최종 제출 완료</span>
+                                            <span class="activity-points" id="sum-mission-points">0 P</span>
+                                        </div>
+                                        <p class="activity-rule">성공 시 10P (수동 검수)</p>
+                                    </div>
+                                </div>
+                                <!-- Blog Activity -->
+                                <div class="activity-summary-item">
+                                    <div class="activity-indicator blog">
+                                        <span class="activity-icon">✍️</span>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-meta">
+                                            <span class="activity-name">회고 / 기술 블로그</span>
+                                            <span class="activity-points" id="sum-blog-points">0 P</span>
+                                        </div>
+                                        <p class="activity-rule">작성 시 20P (수동 검수)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Rankings -->
+                        <div class="dashboard-right">
+                            <!-- Rankings Tab Options -->
+                            <div class="rankings-container glass-card">
+                                <div class="rankings-header-tabs">
+                                    <button class="rank-tab-btn active" data-tab="crews-rank">👥 크루 랭킹</button>
+                                    <button class="rank-tab-btn" data-tab="coaches-rank">👑 인기 코치 랭킹</button>
+                                </div>
+
+                                <!-- Crew Rankings Table -->
+                                <div id="tab-crews-rank" class="rank-tab-content active">
+                                    <div class="rank-table-wrapper">
+                                        <table class="rank-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>순위</th>
+                                                    <th>닉네임</th>
+                                                    <th>아이디</th>
+                                                    <th class="text-right">포인트</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="crew-ranking-list">
+                                                <!-- Dynamic Content -->
+                                                <tr><td colspan="4" class="text-center">랭킹 조회 중...</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Coach Rankings Table -->
+                                <div id="tab-coaches-rank" class="rank-tab-content">
+                                    <div class="rank-table-wrapper">
+                                        <table class="rank-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>순위</th>
+                                                    <th>코치명</th>
+                                                    <th class="text-right">매칭/사용 횟수</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="coach-ranking-list">
+                                                <!-- Dynamic Content -->
+                                                <tr><td colspan="3" class="text-center">랭킹 조회 중...</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- [SUBVIEW B] CHECKLIST -->
+                <section id="subview-checklist" class="subview fade-in" style="display: none;">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">주간 포인트 체크리스트</h2>
+                            <p class="section-desc">이번주의 획득 현황과 기간을 확인하고 미션/블로그 인증을 진행하세요.</p>
+                        </div>
+                        <span class="date-badge" id="checklist-week-range">2026-05-18 ~ 2026-05-24</span>
+                    </div>
+
+                    <!-- Progress Banner -->
+                    <div class="checklist-progress-banner glass-card">
+                        <div class="banner-text">
+                            <h3>이번주 획득 총 포인트</h3>
+                            <p>주간 최대 100P 한도 내에서 활동 인정됩니다.</p>
+                        </div>
+                        <div class="banner-numeric">
+                            <span class="earned" id="checklist-weekly-earned">0</span>
+                            <span class="slash">/</span>
+                            <span class="max">100 P</span>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Checklist Grid -->
+                    <div class="checklist-detail-grid">
+                        <div class="checklist-table-card glass-card">
+                            <h3 class="panel-title">세부 활동 기록</h3>
+                            <div class="checklist-items-container" id="checklist-items">
+                                <!-- Dynamic JS Checklist items -->
+                            </div>
+                        </div>
+
+                        <!-- Manual/Pending Activities Submissions -->
+                        <div class="checklist-form-card glass-card">
+                            <h3 class="panel-title">활동 수동 인증 제출</h3>
+                            
+                            <!-- Tabs for submission types -->
+                            <div class="submission-tabs">
+                                <button class="sub-tab-btn active" data-form="mission-form-container">🏆 미션 완료</button>
+                                <button class="sub-tab-btn" data-form="blog-form-container">✍️ 블로그/회고</button>
+                                <button class="sub-tab-btn" data-form="github-form-container">⚙️ 수동 커밋/리뷰</button>
+                            </div>
+
+                            <!-- Form 1: Mission Submit -->
+                            <div id="mission-form-container" class="sub-form-content active">
+                                <form id="form-mission-submit" class="submission-form">
+                                    <div class="form-group">
+                                        <label for="mission-date">활동 일자</label>
+                                        <input type="date" id="mission-date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="mission-image">인증 사진 업로드</label>
+                                        <input type="file" id="mission-image" accept="image/*" required>
+                                        <div class="image-preview-box" id="mission-image-preview">
+                                            <span class="preview-placeholder">사진을 선택하면 미리보기가 나타납니다.</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="mission-memo">메모 (선택)</label>
+                                        <textarea id="mission-memo" rows="2" placeholder="미션 소감이나 코멘트를 작성하세요."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block">미션 인증 신청</button>
+                                </form>
+                            </div>
+
+                            <!-- Form 2: Blog Submit -->
+                            <div id="blog-form-container" class="sub-form-content">
+                                <form id="form-blog-submit" class="submission-form">
+                                    <div class="form-group">
+                                        <label for="blog-date">활동 일자</label>
+                                        <input type="date" id="blog-date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="blog-url">블로그 URL</label>
+                                        <input type="url" id="blog-url" placeholder="https://velog.io/@username/..." required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="blog-memo">메모 (선택)</label>
+                                        <textarea id="blog-memo" rows="2" placeholder="작성한 내용 요약 등을 남겨주세요."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block">블로그 인증 신청</button>
+                                </form>
+                            </div>
+
+                            <!-- Form 3: GitHub Test Inputs (Admin/Simulations) -->
+                            <div id="github-form-container" class="sub-form-content">
+                                <div class="github-simulation-box">
+                                    <p class="sim-notice">💡 아래 기능은 로컬 시연 및 수동 포인트 지급을 위한 테스트용 API입니다.</p>
+                                    
+                                    <div class="sim-section">
+                                        <h4>커밋 인증 신청</h4>
+                                        <form id="form-commit-submit" class="sim-form">
+                                            <input type="date" id="commit-date" required>
+                                            <input type="url" id="commit-url" placeholder="커밋 URL" required>
+                                            <button type="submit" class="btn btn-outline btn-sm">커밋 적립</button>
+                                        </form>
+                                    </div>
+
+                                    <div class="sim-section">
+                                        <h4>리뷰 인증 신청</h4>
+                                        <form id="form-review-submit" class="sim-form">
+                                            <input type="date" id="review-date" required>
+                                            <input type="url" id="review-url" placeholder="리뷰 코멘트 URL" required>
+                                            <button type="submit" class="btn btn-outline btn-sm">리뷰 적립</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- [SUBVIEW C] SHOP -->
+                <section id="subview-shop" class="subview fade-in" style="display: none;">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">포인트 상점</h2>
+                            <p class="section-desc">획득한 포인트로 랜덤박스 및 코치 이용권을 교환해 보세요.</p>
+                        </div>
+                        <div class="shop-balance glass-card">
+                            <span class="bal-label">내 포인트</span>
+                            <span class="bal-val" id="shop-user-points">0 P</span>
+                        </div>
+                    </div>
+
+                    <!-- Shop Item List -->
+                    <div class="shop-item-grid">
+                        
+                        <!-- 1. Random Box Card (Gamified) -->
+                        <div class="shop-card glass-card random-box-card border-glow-gold">
+                            <div class="ribbon">Best Value</div>
+                            <div class="random-box-visual">
+                                <div class="chest-box" id="chest-animation-box">🎁</div>
+                            </div>
+                            <div class="shop-card-info">
+                                <h3 class="item-name">행운의 랜덤박스</h3>
+                                <p class="item-desc">꽝부터 50P, 또는 1% 확률의 <strong>코치 이용권</strong>까지 획득!</p>
+                                <div class="item-probabilities">
+                                    <span>꽝: 25%</span>
+                                    <span>5P-20P: 65%</span>
+                                    <span>50P: 9%</span>
+                                    <span>코치권: 1%</span>
+                                </div>
+                                <div class="price-buy-row">
+                                    <div class="item-price"><span class="premium-coin"></span> 10 P</div>
+                                    <button class="btn btn-gold" id="btn-buy-randombox">구매 & 열기</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Cafe Ticket Card -->
+                        <div class="shop-card glass-card border-glow-indigo">
+                            <div class="shop-card-visual cafe-visual">☕</div>
+                            <div class="shop-card-info">
+                                <h3 class="item-name">코치 이용권 - 카페</h3>
+                                <p class="item-desc">코치님과 티타임을 즐기세요! 커피와 디저트를 함께 즐길 수 있는 특별 쿠폰입니다.</p>
+                                <span class="limit-badge">주간 1회 구매 한정</span>
+                                <div class="price-buy-row">
+                                    <div class="item-price"><span class="premium-coin"></span> 100 P</div>
+                                    <button class="btn btn-primary" id="btn-buy-cafe-ticket">이용권 구매</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Meal Ticket Card -->
+                        <div class="shop-card glass-card border-glow-purple">
+                            <div class="shop-card-visual meal-visual">🍱</div>
+                            <div class="shop-card-info">
+                                <h3 class="item-name">코치 이용권 - 식사</h3>
+                                <p class="item-desc">코치님과의 든든한 식사 한 끼! 랜덤으로 배정되는 코치님과 진솔한 대화를 나눠보세요.</p>
+                                <span class="limit-badge">주간 1회 구매 한정</span>
+                                <div class="price-buy-row">
+                                    <div class="item-price"><span class="premium-coin"></span> 300 P</div>
+                                    <button class="btn btn-primary" id="btn-buy-meal-ticket">이용권 구매</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post-purchase inventory & history -->
+                    <div class="shop-inventory-grid">
+                        
+                        <!-- Left Panel: My Tickets -->
+                        <div class="inventory-card glass-card">
+                            <h3 class="panel-title">나의 코치 이용권 목록</h3>
+                            <div class="tickets-container" id="my-tickets-list">
+                                <!-- Dynamic JS ticket list -->
+                                <p class="text-center font-muted">보유한 이용권이 없습니다. 포인트를 모아 교환해보세요!</p>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Point History -->
+                        <div class="history-card glass-card">
+                            <h3 class="panel-title">포인트 적립 / 차감 내역</h3>
+                            <div class="history-table-wrapper">
+                                <table class="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>구분</th>
+                                            <th>포인트</th>
+                                            <th>상세 내용</th>
+                                            <th class="text-right">시간</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="point-history-list">
+                                        <!-- Dynamic JS history items -->
+                                        <tr><td colspan="4" class="text-center font-muted">내역이 존재하지 않습니다.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- [SUBVIEW D] ADMIN PANEL -->
+                <section id="subview-admin" class="subview fade-in" style="display: none;">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">🛡️ 관리자 검수 패널</h2>
+                            <p class="section-desc">크루들이 신청한 미션 및 블로그 활동 인증 내역을 검수하고 승인/반려 처리를 진행합니다.</p>
+                        </div>
+                        <div class="admin-actions">
+                            <button id="btn-admin-github-sync" class="btn btn-outline">
+                                ⚙️ 전체 크루 GitHub 일괄 동기화
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pending Submissions Table -->
+                    <div class="admin-card glass-card">
+                        <h3 class="panel-title">활동 검수 대기 목록</h3>
+                        <div class="admin-table-wrapper">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>신청 크루</th>
+                                        <th>유형</th>
+                                        <th>증빙 자료</th>
+                                        <th>메모</th>
+                                        <th class="text-center">조치</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-pending-list">
+                                    <!-- Dynamic JS Pending List -->
+                                    <tr><td colspan="5" class="text-center">현재 검수 대기 중인 활동이 없습니다.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== 4. MODALS & POPUPS ==================== -->
+    
+    <!-- 4.1 Chest / Random Box Result Modal -->
+    <div id="randombox-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-content glass-card chest-modal-card bounce-in">
+            <div class="modal-glow"></div>
+            <div class="modal-logo">🎲</div>
+            <h2 class="modal-title" id="box-result-title">뽑는 중...</h2>
+            
+            <div class="box-animation-container">
+                <div class="opening-chest-visual" id="modal-chest-visual">🎁</div>
+            </div>
+            
+            <div class="box-result-card" id="box-result-card" style="opacity: 0;">
+                <div class="reward-badge" id="reward-badge">10 P</div>
+                <p class="reward-desc" id="reward-desc">축하합니다! 포인트를 획득했습니다.</p>
+            </div>
+            
+            <div class="modal-actions" style="margin-top: 24px;">
+                <button class="btn btn-primary" id="btn-close-box-modal" style="display: none;">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4.2 Generic Alert / Confirmation Dialog -->
+    <div id="alert-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-content glass-card mini-modal-card">
+            <h3 class="modal-title" id="alert-title">안내</h3>
+            <p class="modal-message" id="alert-message">내용</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="btn-alert-cancel" style="display: none;">취소</button>
+                <button class="btn btn-primary" id="btn-alert-ok">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core App JS -->
+    <script src="/app.js"></script>
+</body>
+</html>
