@@ -232,21 +232,7 @@ const API = {
         }).then(this.handleResponse);
     },
 
-    async submitCommit(crewId, activityDate, githubUrl) {
-        return fetch(`${this.baseUrl}/crews/${crewId}/activities/commit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ activityDate, githubUrl })
-        }).then(this.handleResponse);
-    },
 
-    async submitReview(crewId, activityDate, reviewUrl) {
-        return fetch(`${this.baseUrl}/crews/${crewId}/activities/review`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ activityDate, reviewUrl })
-        }).then(this.handleResponse);
-    },
 
     async submitMission(crewId, activityDate, imageFile, memo) {
         const formData = new FormData();
@@ -505,44 +491,7 @@ const App = {
             }
         });
 
-        // Test Commit/Review Forms
-        document.getElementById('form-commit-submit').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const date = document.getElementById('commit-date').value;
-            const url = document.getElementById('commit-url').value.trim();
-            this.showLoader(true);
-            try {
-                const response = await API.submitCommit(state.currentCrew.crewId, date, url);
-                showToast(response.message, response.earnedPoint > 0 ? 'success' : 'warning');
-                if (response.earnedPoint > 0) soundSynth.playSuccess();
-                document.getElementById('form-commit-submit').reset();
-                await this.refreshUserContext();
-                if (state.activeView === 'checklist') this.renderChecklist();
-            } catch (err) {
-                showToast(err.message, 'danger');
-            } finally {
-                this.showLoader(false);
-            }
-        });
 
-        document.getElementById('form-review-submit').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const date = document.getElementById('review-date').value;
-            const url = document.getElementById('review-url').value.trim();
-            this.showLoader(true);
-            try {
-                const response = await API.submitReview(state.currentCrew.crewId, date, url);
-                showToast(response.message, response.earnedPoint > 0 ? 'success' : 'warning');
-                if (response.earnedPoint > 0) soundSynth.playSuccess();
-                document.getElementById('form-review-submit').reset();
-                await this.refreshUserContext();
-                if (state.activeView === 'checklist') this.renderChecklist();
-            } catch (err) {
-                showToast(err.message, 'danger');
-            } finally {
-                this.showLoader(false);
-            }
-        });
 
         // Shop Buy Buttons
         document.getElementById('btn-buy-randombox').addEventListener('click', () => this.handleBuyRandomBox());
@@ -770,8 +719,6 @@ const App = {
         const todayStr = new Date().toISOString().substring(0, 10);
         document.getElementById('mission-date').value = todayStr;
         document.getElementById('blog-date').value = todayStr;
-        document.getElementById('commit-date').value = todayStr;
-        document.getElementById('review-date').value = todayStr;
 
         // Render checklist items
         const listContainer = document.getElementById('checklist-items');

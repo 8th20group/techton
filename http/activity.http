@@ -6,25 +6,6 @@
 @activityId = 1
 
 
-### 커밋 활동 등록 (즉시 포인트 지급)
-POST {{baseUrl}}/crews/{{crewId}}/activities/commit
-Content-Type: application/json
-
-{
-  "activityDate": "2026-05-22",
-  "githubUrl": "https://github.com/woowacourse/jwp-shopping-cart/commit/abc1234"
-}
-
-
-### PR 리뷰 활동 등록 (즉시 포인트 지급)
-POST {{baseUrl}}/crews/{{crewId}}/activities/review
-Content-Type: application/json
-
-{
-  "activityDate": "2026-05-22",
-  "reviewUrl": "https://github.com/woowacourse/jwp-shopping-cart/pull/42#pullrequestreview-123456"
-}
-
 
 ### 블로그 활동 등록 (관리자 승인 후 포인트 지급)
 POST {{baseUrl}}/crews/{{crewId}}/activities/blog

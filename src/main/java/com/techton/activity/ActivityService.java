@@ -6,10 +6,8 @@ import com.techton.activity.dto.ActivityRejectRequest;
 import com.techton.activity.dto.ActivityRejectResponse;
 import com.techton.activity.dto.ActivitySubmitResponse;
 import com.techton.activity.dto.BlogActivityRequest;
-import com.techton.activity.dto.CommitActivityRequest;
 import com.techton.activity.dto.CrewActivityResponse;
 import com.techton.activity.dto.PendingActivityResponse;
-import com.techton.activity.dto.ReviewActivityRequest;
 import com.techton.activity.dto.WeeklyActivityItemResponse;
 import com.techton.activity.dto.WeeklyActivitiesResponse;
 import com.techton.crew.Crew;
@@ -39,17 +37,7 @@ public class ActivityService {
     private final PointHistoryRepository pointHistoryRepository;
     private final FileStorage fileStorage;
 
-    public ActivityEarnResponse commit(Long crewId, CommitActivityRequest request) {
-        LocalDate activityDate = parseDate(request.activityDate());
-        validateRequired(request.githubUrl(), "커밋 URL은 필수입니다.");
-        return approveDailyActivity(crewId, ActivityType.COMMIT, activityDate, request.githubUrl(), null);
-    }
 
-    public ActivityEarnResponse review(Long crewId, ReviewActivityRequest request) {
-        LocalDate activityDate = parseDate(request.activityDate());
-        validateRequired(request.reviewUrl(), "리뷰 URL은 필수입니다.");
-        return approveDailyActivity(crewId, ActivityType.REVIEW, activityDate, request.reviewUrl(), null);
-    }
 
     public int syncGithubCommit(Crew crew, LocalDate activityDate, String evidenceUrl) {
         return approveDailyActivity(crew, ActivityType.COMMIT, activityDate, evidenceUrl, "GitHub public event 자동 동기화");
