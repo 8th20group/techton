@@ -615,17 +615,20 @@ Response
 
 ```http
 POST /crews/{crewId}/activities/mission
+Content-Type: multipart/form-data
 ```
 
-Request
+미션 인증은 사진 파일을 직접 업로드합니다. (`multipart/form-data`)
 
-```json
-{
-  "activityDate": "2026-05-22",
-  "imageUrl": "https://image-url.com/mission.png",
-  "memo": "LMS 최종 단계 완료했습니다."
-}
-```
+Request (form-data)
+
+| 필드 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| `activityDate` | text | O | 활동 일자 (yyyy-MM-dd) |
+| `image` | file | O | 미션 인증 사진 파일 |
+| `memo` | text | X | 인증 메모 |
+
+업로드한 사진은 서버에 저장되며, 검수 목록에서는 저장된 경로가 `evidenceUrl`로 제공됩니다.
 
 Response
 

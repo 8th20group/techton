@@ -4,6 +4,7 @@ import com.techton.coach.Coach;
 import com.techton.coach.CoachRepository;
 import com.techton.crew.Crew;
 import com.techton.crew.CrewRepository;
+import com.techton.global.WeekRange;
 import com.techton.ranking.dto.CoachRankingResponse;
 import com.techton.ranking.dto.CrewRankingResponse;
 import com.techton.ticket.TicketRepository;
@@ -38,7 +39,8 @@ public class RankingService {
                 .stream()
                 .collect(Collectors.toMap(Coach::getId, Function.identity()));
 
-        List<CoachRankingResponse> rankings = ticketRepository.countUsedTicketsGroupByCoachId()
+        List<CoachRankingResponse> rankings = ticketRepository
+                .countUsedTicketsGroupByCoachId(WeekRange.startOfWeek(), WeekRange.endOfWeek())
                 .stream()
                 .map(row -> toCoachRanking(row, coaches))
                 .filter(response -> response.coachName() != null)

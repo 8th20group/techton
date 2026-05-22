@@ -3,6 +3,7 @@ package com.techton.activity;
 import com.techton.activity.dto.ActivityApprovalResponse;
 import com.techton.activity.dto.ActivityEarnResponse;
 import com.techton.activity.dto.ActivityRejectRequest;
+import com.techton.activity.dto.ActivityRejectResponse;
 import com.techton.activity.dto.ActivitySubmitResponse;
 import com.techton.activity.dto.BlogActivityRequest;
 import com.techton.activity.dto.CommitActivityRequest;
@@ -66,7 +67,7 @@ public class ActivityController {
     }
 
     @PatchMapping("/admin/activities/{activityId}/reject")
-    public ActivitySubmitResponse reject(@PathVariable Long activityId, @RequestBody ActivityRejectRequest request) {
+    public ActivityRejectResponse reject(@PathVariable Long activityId, @RequestBody ActivityRejectRequest request) {
         return activityService.reject(activityId, request);
     }
 }
