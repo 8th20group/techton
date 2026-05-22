@@ -1,0 +1,10 @@
+### 기본 URL
+@baseUrl = http://localhost:8080
+
+
+### GitHub public 활동 수동 동기화
+POST {{baseUrl}}/admin/activities/github/sync
+
+
+### 특정 날짜 GitHub public 활동 수동 동기화
+POST {{baseUrl}}/admin/activities/github/sync?activityDate=2026-05-22

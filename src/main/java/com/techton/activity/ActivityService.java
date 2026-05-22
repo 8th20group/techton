@@ -49,6 +49,14 @@ public class ActivityService {
         return approveDailyActivity(crewId, ActivityType.REVIEW, activityDate, request.reviewUrl(), null);
     }
 
+    public int syncGithubCommit(Crew crew, LocalDate activityDate, String evidenceUrl) {
+        return approveDailyActivity(crew, ActivityType.COMMIT, activityDate, evidenceUrl, "GitHub public event 자동 동기화");
+    }
+
+    public int syncGithubReview(Crew crew, LocalDate activityDate, String evidenceUrl) {
+        return approveDailyActivity(crew, ActivityType.REVIEW, activityDate, evidenceUrl, "GitHub public event 자동 동기화");
+    }
+
     public ActivitySubmitResponse mission(Long crewId, String activityDate, MultipartFile image, String memo) {
         Crew crew = findCrew(crewId);
         LocalDate date = parseDate(activityDate);
@@ -149,9 +157,21 @@ public class ActivityService {
     private ActivityEarnResponse approveDailyActivity(Long crewId, ActivityType type, LocalDate activityDate,
                                                      String evidenceUrl, String memo) {
         Crew crew = findCrew(crewId);
-        if (activityRepository.existsByCrewIdAndTypeAndStatusAndActivityDate(
-                crewId, type, ActivityStatus.APPROVED, activityDate)) {
+        if (hasApprovedDailyActivity(crew.getId(), type, activityDate)) {
             return new ActivityEarnResponse(type, 0, "오늘은 이미 " + type.getDisplayName() + " 포인트를 획득했습니다");
+        }
+
+        int earnedPoint = approveDailyActivity(crew, type, activityDate, evidenceUrl, memo);
+        String message = earnedPoint > 0
+                ? type.getDisplayName() + " 인증 완료"
+                : "이번주 포인트 획득 한도에 도달했습니다";
+        return new ActivityEarnResponse(type, earnedPoint, message);
+    }
+
+    private int approveDailyActivity(Crew crew, ActivityType type, LocalDate activityDate, String evidenceUrl, String memo) {
+        Long crewId = crew.getId();
+        if (hasApprovedDailyActivity(crewId, type, activityDate)) {
+            return 0;
         }
 
         int earnedPoint = calculateEarnablePoint(crewId, type, activityDate);
@@ -161,10 +181,12 @@ public class ActivityService {
             pointHistoryRepository.save(PointHistory.earn(crew.getId(), earnedPoint, type.getDisplayName() + " 인증"));
         }
 
-        String message = earnedPoint > 0
-                ? type.getDisplayName() + " 인증 완료"
-                : "이번주 포인트 획득 한도에 도달했습니다";
-        return new ActivityEarnResponse(type, earnedPoint, message);
+        return earnedPoint;
+    }
+
+    private boolean hasApprovedDailyActivity(Long crewId, ActivityType type, LocalDate activityDate) {
+        return activityRepository.existsByCrewIdAndTypeAndStatusAndActivityDate(
+                crewId, type, ActivityStatus.APPROVED, activityDate);
     }
 
     private int calculateEarnablePoint(Long crewId, ActivityType type, LocalDate activityDate) {

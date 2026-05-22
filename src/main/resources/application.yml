@@ -22,3 +22,7 @@ springdoc:
     tags-sorter: alpha
   api-docs:
     path: /v3/api-docs
+
+github:
+  api:
+    base-url: https://api.github.com

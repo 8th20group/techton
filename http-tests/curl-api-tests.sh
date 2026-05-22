@@ -100,6 +100,9 @@ BLOG_ACTIVITY_ID="$(extract_number "$BLOG_RESPONSE" "activityId")"
 request "검수 대기 목록 조회" \
   "$BASE_URL/admin/activities/pending"
 
+request "GitHub public 활동 수동 동기화" \
+  -X POST "$BASE_URL/admin/activities/github/sync?activityDate=$TODAY"
+
 if [ -n "$MISSION_ACTIVITY_ID" ]; then
   request "미션 인증 승인 - 10P 지급" \
     -X PATCH "$BASE_URL/admin/activities/$MISSION_ACTIVITY_ID/approve"
