@@ -6,6 +6,7 @@ public record GitHubActivitySyncResponse(
         LocalDate activityDate,
         int crewCount,
         int commitSyncedCount,
-        int reviewSyncedCount
+        int reviewSyncedCount,
+        String message
 ) {
 }

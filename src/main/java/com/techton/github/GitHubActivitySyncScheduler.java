@@ -11,7 +11,7 @@ public class GitHubActivitySyncScheduler {
 
     private final GitHubActivitySyncService gitHubActivitySyncService;
 
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 6 * * *", zone = "Asia/Seoul")
     public void syncYesterday() {
         gitHubActivitySyncService.sync(LocalDate.now().minusDays(1));
     }

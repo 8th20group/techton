@@ -1,10 +1,21 @@
 ### 기본 URL
 @baseUrl = http://localhost:8080
 
+### 변수 (실제 값으로 변경하세요)
+@crewId = 1
 
-### GitHub public 활동 수동 동기화
+
+### 내 GitHub public 활동 불러오기 - 오늘 기준
+POST {{baseUrl}}/crews/{{crewId}}/activities/github/sync
+
+
+### 내 GitHub public 활동 불러오기 - 특정 날짜 기준
+POST {{baseUrl}}/crews/{{crewId}}/activities/github/sync?activityDate=2026-05-22
+
+
+### 전체 크루 GitHub public 활동 관리자 동기화 - 기본값은 전날
 POST {{baseUrl}}/admin/activities/github/sync
 
 
-### 특정 날짜 GitHub public 활동 수동 동기화
+### 전체 크루 GitHub public 활동 관리자 동기화 - 특정 날짜 기준
 POST {{baseUrl}}/admin/activities/github/sync?activityDate=2026-05-22
