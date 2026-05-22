@@ -46,4 +46,8 @@ public class Crew {
         this.track = track;
         this.point = INITIAL_POINT;
     }
+
+    public void addPoint(int point) {
+        this.point += point;
+    }
 }
